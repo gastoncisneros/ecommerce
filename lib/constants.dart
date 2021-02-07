@@ -15,4 +15,11 @@ class Constants{
     fontWeight: FontWeight.w600,
     color: Colors.black
   );
+
+  
+  static const regularDarkTest = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.w600,
+    color: Colors.black
+  );
 }

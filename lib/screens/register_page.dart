@@ -1,18 +1,17 @@
-import 'package:e_commerce/constants.dart';
-import 'package:e_commerce/screens/home_page.dart';
-import 'package:e_commerce/screens/landing_page.dart';
-import 'package:e_commerce/screens/register_page.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_commerce/widgets/custom_button.dart';
 import 'package:e_commerce/widgets/custom_input.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
+import '../constants.dart';
+
+class RegisterPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+
 
   //Build an alert dialog to display some errors
   Future<void> _alertDialogBuilder(String error) async{
@@ -38,12 +37,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  //Login user Account
-  Future<String> _loginAccount() async{
+  //Create new user Account
+  Future<String> _createAccount() async{
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _userEmail,
-        password: _userPassword
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _registerEmail,
+        password: _registerPassword
       );
 
       return null;
@@ -63,25 +62,29 @@ class _LoginPageState extends State<LoginPage> {
   void _submitForm() async{
 
     setState(() {
-     _loginFormLoading = true; 
+     _registerFormLoading = true; 
     });
  
-    String _loginAccountFeedback = await _loginAccount();
-    if(_loginAccountFeedback != null){
-      _alertDialogBuilder(_loginAccountFeedback);
+    String _crateAccountFeedback = await _createAccount();
+    if(_crateAccountFeedback != null){
+      _alertDialogBuilder(_crateAccountFeedback);
       
       setState(() {
-      _loginFormLoading = false; 
+      _registerFormLoading = false; 
       });
-    } 
+    } else{
+      //The string was null so user is logued in.
+      Navigator.pop(context);
+    }
+    
   }
 
   //Default form loading state
-  bool _loginFormLoading = false;
+  bool _registerFormLoading = false;
 
   //Form input state variables
-  String _userEmail = "";
-  String _userPassword = "";
+  String _registerEmail = "";
+  String _registerPassword = "";
   
   //Focus node for input field
   FocusNode _passwordFocusNode;
@@ -98,10 +101,10 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Container(
+      child: Scaffold(
       body: SafeArea(
         child: Container(
           width: double.infinity,
@@ -113,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: EdgeInsets.only(
                   top: 24.0
                 ),
-                child: Text("Welcome User, \n Login to your Account",
+                child: Text("Create a new Account",
                 textAlign: TextAlign.center,
                 style: Constants.boldHeading,
                 ),
@@ -122,9 +125,9 @@ class _LoginPageState extends State<LoginPage> {
               Column(
                 children: <Widget>[
                   CustomInput(
-                    hintText:"Email",
+                    hintText: "Email",
                     onChanged: (value){
-                      _userEmail = value;
+                      _registerEmail = value;
                     },
                     onSubmitted: (value){
                       _passwordFocusNode.requestFocus();
@@ -134,21 +137,21 @@ class _LoginPageState extends State<LoginPage> {
                   CustomInput(
                     hintText:"Password",
                     onChanged: (value){
-                      _userPassword = value;
+                      _registerPassword = value;
                     },
                     focusNode: _passwordFocusNode,
+                    isPasswordField: true,
                     onSubmitted: (value){
                       _submitForm();
                     },
-                    isPasswordField: true,
                     ),
                   CustomBtn(
-                    text: "Login",
-                    onPressed:(){
+                    text: "Create Account",
+                    onPressed: (){
                       _submitForm();
                     },
-                    outlineBtn:false,
-                    isLoading: _loginFormLoading,
+                    outlineBtn: false,
+                    isLoading: _registerFormLoading,
                   )
                 ],
               ),
@@ -158,19 +161,19 @@ class _LoginPageState extends State<LoginPage> {
                   bottom: 16.0
                 ),
                 child: CustomBtn(
-                text:"New Account", 
+                text:"Back to Login", 
                 onPressed:(){
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => RegisterPage()
-                  ));
+                  Navigator.pop(context);
                 }, 
-                 outlineBtn:true
+                 outlineBtn: true,
+                 isLoading: false
                 ),
               )
             ],
           ),
         ),
       )
+     ),
     );
   }
 }
